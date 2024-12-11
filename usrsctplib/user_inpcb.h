@@ -35,6 +35,8 @@
 
 #include <user_route.h> /* was <net/route.h> */
 
+#define inpcb user_inpcb
+
 struct inpcbpolicy;
 
 /*

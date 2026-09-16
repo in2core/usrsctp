@@ -62,6 +62,9 @@
 #if defined(HAVE_SCTP_PEELOFF_SOCKOPT)
 #include <netinet/sctp_peeloff.h>
 #endif				/* HAVE_SCTP_PEELOFF_SOCKOPT */
+#if defined(_WIN32) && defined(__MINGW32__)
+#include <minmax.h>
+#endif
 
 extern const struct sctp_cc_functions sctp_cc_functions[];
 extern const struct sctp_ss_functions sctp_ss_functions[];
@@ -604,8 +607,9 @@ sctp_getcred(SYSCTL_HANDLER_ARGS)
 	/* FIX, for non-bsd is this right? */
 	vrf_id = SCTP_DEFAULT_VRFID;
 
+	if (req->newptr == NULL)
+		return (EINVAL);
 	error = priv_check(req->td, PRIV_NETINET_GETCRED);
-
 	if (error)
 		return (error);
 
@@ -8891,7 +8895,6 @@ sctp_peeraddr(struct socket *so, struct mbuf *nam)
 	.pr_control =	in_control,				\
 	.pr_close =	sctp_close,				\
 	.pr_detach =	sctp_close,				\
-	.pr_sopoll =	sopoll_generic,				\
 	.pr_flush =	sctp_flush,				\
 	.pr_disconnect = sctp_disconnect,			\
 	.pr_listen =	sctp_listen,				\
